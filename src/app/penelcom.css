@@ -1663,6 +1663,10 @@ p {
         align-items: flex-start;
     }
     
+    .footer-cta-content p {
+        text-align: left;
+    }
+    
     .footer-content {
         grid-template-columns: 1fr;
         gap: 40px;
