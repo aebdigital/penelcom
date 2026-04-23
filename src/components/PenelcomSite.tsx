@@ -1,13 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createPortal } from "react-dom";
+import { type CSSProperties, useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { openCookieSettings } from "@/components/CookieConsent";
+import RollingText from "@/components/RollingText";
 import {
   aboutParagraphs,
   heroImages,
   materialHighlights,
   services,
 } from "@/data/content";
+import { siteMeta } from "@/data/site";
 
 const navItems = [
   { label: "Domov", href: "#home" },
@@ -50,12 +54,7 @@ export default function PenelcomSite() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [privacyOpen, setPrivacyOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const [heroParallax, setHeroParallax] = useState(0);
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -73,6 +72,7 @@ export default function PenelcomSite() {
 
       setIsScrolled(window.scrollY > triggerPoint);
       setScrollProgress(documentHeight > 0 ? (window.scrollY / documentHeight) * 100 : 0);
+      setHeroParallax(Math.min(window.scrollY * 0.24, 240));
     };
 
     updateScrollState();
@@ -126,27 +126,9 @@ export default function PenelcomSite() {
     };
   }, []);
 
-  useEffect(() => {
-    document.body.classList.toggle("modal-open", privacyOpen);
-
-    return () => {
-      document.body.classList.remove("modal-open");
-    };
-  }, [privacyOpen]);
-
-  useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setPrivacyOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", closeOnEscape);
-    return () => document.removeEventListener("keydown", closeOnEscape);
-  }, []);
-
   const closeMenu = () => setMenuOpen(false);
   const showSolidNav = isScrolled || menuOpen;
+  const heroStyle = { "--hero-parallax": `${heroParallax}px` } as CSSProperties & Record<"--hero-parallax", string>;
 
   return (
     <>
@@ -158,7 +140,7 @@ export default function PenelcomSite() {
         <div className="nav-container">
           <div className="nav-logo">
             <a href="#home" className="logo-link" onClick={closeMenu} aria-label="Penelcom domov">
-              <img src="/assets/logo.png" alt="Penelcom" className="logo-img" />
+              <Image src="/assets/logo.png" alt="Penelcom" width={916} height={126} className="logo-img" priority />
             </a>
           </div>
           <ul className={`nav-menu ${menuOpen ? "active" : ""}`}>
@@ -184,13 +166,16 @@ export default function PenelcomSite() {
         </div>
       </nav>
 
-      <section id="home" className="hero">
+      <section id="home" className="hero" style={heroStyle}>
         <div className="hero-background" aria-hidden="true">
           {heroImages.map((image, index) => (
-            <img
+            <Image
               key={image.src}
               src={image.src}
               alt={image.alt}
+              fill
+              priority={index === 0}
+              sizes="100vw"
               className={`hero-bg-image ${index === activeHero ? "active" : ""}`}
             />
           ))}
@@ -198,23 +183,25 @@ export default function PenelcomSite() {
 
         <div className="hero-content">
           <div className="hero-text">
-            <h1 className="hero-title">Elektrina a bezpečnosť pod kontrolou</h1>
-            <p className="hero-subtitle">
+            <h1 className="hero-title" data-reveal>
+              Elektrina a bezpečnosť pod kontrolou
+            </h1>
+            <p className="hero-subtitle" data-reveal>
               Spoľahlivý partner v elektrotechnických službách od roku 2012. Špecializujeme sa na
               elektroinštalácie, fotovoltiku, meranie a regulácie, NN rozvádzače a zabezpečovacie systémy.
             </p>
-            <div className="hero-actions">
-              <a href="#gallery" className="cta-btn primary">
-                PROJEKTY
+            <div className="hero-actions" data-reveal>
+              <a href="#gallery" className="cta-btn primary roll-btn">
+                <RollingText>PROJEKTY</RollingText>
               </a>
-              <a href="#services" className="cta-btn secondary">
-                NAŠE SLUŽBY
+              <a href="#services" className="cta-btn secondary roll-btn">
+                <RollingText>NAŠE SLUŽBY</RollingText>
               </a>
             </div>
           </div>
 
           <div className="hero-right">
-            <div className="hero-stats">
+            <div className="hero-stats" data-reveal>
               <div className="stat-item">
                 <div className="stat-number">
                   500<span className="stat-plus">+</span>
@@ -227,14 +214,14 @@ export default function PenelcomSite() {
               </div>
             </div>
 
-            <div className="hero-testimonial">
+            <div className="hero-testimonial" data-reveal>
               <blockquote>
                 &quot;Realizovali nám kvalitný projekt s maximálnou starostlivosťou. Spokojnosť s prístupom,
                 kvalitou a dodržaním termínov. Odporúčame PENELCOM každému.&quot;
               </blockquote>
               <div className="testimonial-author">
                 <div className="author-avatar">
-                  <img src="/assets/hero/meranie-1.jpeg" alt="Zákazník" />
+                  <Image src="/assets/hero/meranie-1.jpeg" alt="Zákazník" fill sizes="50px" />
                 </div>
                 <div className="author-info">
                   <span className="author-name">Ján M.</span>
@@ -246,7 +233,7 @@ export default function PenelcomSite() {
               </div>
             </div>
 
-            <a href="#" className="more-testimonials">
+            <a href="#" className="more-testimonials" data-reveal>
               VIAC REFERENCIÍ
             </a>
           </div>
@@ -256,7 +243,7 @@ export default function PenelcomSite() {
       <section id="about" className="about">
         <div className="container">
           <div className="about-content">
-            <div className="about-left">
+            <div className="about-left" data-reveal>
               <div className="about-header">
                 <span className="about-label">— Kto sme</span>
                 <h2 className="about-title" data-text="Penelcom">
@@ -268,14 +255,21 @@ export default function PenelcomSite() {
                   <p key={paragraph}>{paragraph}</p>
                 ))}
 
-                <a href="#footer" className="about-btn">
-                  Kontaktovať nás
+                <a href="#footer" className="about-btn roll-btn">
+                  <RollingText>Kontaktovať nás</RollingText>
                   <ArrowIcon />
                 </a>
               </div>
             </div>
-            <div className="about-right">
-              <img src="/assets/services/fotovoltika/fotovoltika-1.jpeg" alt="VDL stavebné služby" className="about-image" />
+            <div className="about-right" data-reveal>
+              <Image
+                src="/assets/services/fotovoltika/fotovoltika-1.jpeg"
+                alt="Fotovoltické riešenia Penelcom"
+                width={1200}
+                height={900}
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="about-image"
+              />
               <div className="about-stats">
                 <div className="stat-box stat-black">
                   <div className="stat-icon">
@@ -306,7 +300,7 @@ export default function PenelcomSite() {
       <section id="services" className="services">
         <div className="container">
           {services.map((service) => (
-            <div className="service-section" key={service.title}>
+            <div className="service-section" key={service.title} data-reveal>
               <div className={`service-content ${service.reverse ? "reverse" : ""}`}>
                 <div className="service-text">
                   <h2 className="service-title" data-text={service.dataText}>
@@ -324,11 +318,32 @@ export default function PenelcomSite() {
                 <div className="service-images">
                   <div className="image-group">
                     <div className="image-left">
-                      <img src={service.images[0].src} alt={service.images[0].alt} className="service-image" />
+                      <Image
+                        src={service.images[0].src}
+                        alt={service.images[0].alt}
+                        width={900}
+                        height={700}
+                        sizes="(max-width: 768px) 100vw, 25vw"
+                        className="service-image"
+                      />
                     </div>
                     <div className="image-right">
-                      <img src={service.images[1].src} alt={service.images[1].alt} className="service-image" />
-                      <img src={service.images[2].src} alt={service.images[2].alt} className="service-image" />
+                      <Image
+                        src={service.images[1].src}
+                        alt={service.images[1].alt}
+                        width={700}
+                        height={500}
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="service-image"
+                      />
+                      <Image
+                        src={service.images[2].src}
+                        alt={service.images[2].alt}
+                        width={700}
+                        height={500}
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="service-image"
+                      />
                     </div>
                   </div>
                 </div>
@@ -341,7 +356,7 @@ export default function PenelcomSite() {
       <section id="materials" className="materials-section">
         <div className="container">
           <div className="materials-content">
-            <div className="materials-info">
+            <div className="materials-info" data-reveal>
               <div className="materials-header">
                 <span className="materials-label">— Náš partner</span>
                 <h2 className="materials-title" data-text="Elektroinštalačný">
@@ -363,8 +378,15 @@ export default function PenelcomSite() {
                 </div>
               </div>
             </div>
-            <div className="materials-image">
-              <img src="/assets/partner-card.png" alt="BAUER - Elektroinštalačný materiál" className="business-card" />
+            <div className="materials-image" data-reveal>
+              <Image
+                src="/assets/partner-card.png"
+                alt="BAUER - Elektroinštalačný materiál"
+                width={940}
+                height={526}
+                sizes="(max-width: 768px) 80vw, 33vw"
+                className="business-card"
+              />
             </div>
           </div>
         </div>
@@ -372,21 +394,21 @@ export default function PenelcomSite() {
 
       <footer id="footer" className="footer">
         <div className="container">
-          <div className="footer-top">
+          <div className="footer-top" data-reveal>
             <div className="footer-cta-content">
               <h2>Potrebujete elektrotechnické služby?</h2>
               <p>Kontaktujte nás a my Vám radi poradíme</p>
             </div>
             <div className="footer-cta-button">
-              <a href="tel:+421949654829" className="footer-btn">
-                Zavolať
+              <a href={siteMeta.phoneHref} className="footer-btn roll-btn">
+                <RollingText>Zavolať</RollingText>
               </a>
             </div>
           </div>
 
           <div className="footer-divider" />
 
-          <div className="footer-content">
+          <div className="footer-content" data-reveal>
             <div className="footer-section footer-contact">
               <h3>Penelcom s.r.o.</h3>
               <p>
@@ -404,10 +426,10 @@ export default function PenelcomSite() {
                 093 01 Vranov nad Topľou (areál DMJ)
               </p>
               <p>
-                <strong>Email:</strong> <a href="mailto:penelcom@penel.sk">info@penelcom.sk</a>
+                <strong>Email:</strong> <a href={`mailto:${siteMeta.legalEmail}`}>{siteMeta.email}</a>
               </p>
               <p>
-                <strong>Telefonický kontakt:</strong> <a href="tel:+421949654829">+421 949 654 829</a>
+                <strong>Telefonický kontakt:</strong> <a href={siteMeta.phoneHref}>{siteMeta.phone}</a>
               </p>
             </div>
 
@@ -442,23 +464,21 @@ export default function PenelcomSite() {
                 <h4>Legal</h4>
                 <ul>
                   <li>
-                    <a
-                      href="#privacy"
-                      id="privacy-policy-link"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        setPrivacyOpen(true);
-                      }}
-                    >
+                    <Link href="/ochrana-osobnych-udajov" id="privacy-policy-link">
                       Ochrana osobných údajov
-                    </a>
+                    </Link>
+                  </li>
+                  <li>
+                    <button type="button" className="footer-cookie-link" onClick={openCookieSettings}>
+                      Cookies
+                    </button>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
 
-          <div className="footer-bottom">
+          <div className="footer-bottom" data-reveal>
             <div className="footer-credit">
               <a href="https://aebdigital.com" target="_blank" rel="noopener noreferrer" className="credit-link">
                 Tvorba stránky - AEB Digital
@@ -471,142 +491,6 @@ export default function PenelcomSite() {
         </div>
       </footer>
 
-      {mounted &&
-        createPortal(
-          <PrivacyModal open={privacyOpen} onClose={() => setPrivacyOpen(false)} />,
-          document.body,
-        )}
     </>
-  );
-}
-
-function PrivacyModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  return (
-    <div
-      id="privacy-modal"
-      className={`modal ${open ? "show" : ""}`}
-      style={{ display: open ? "block" : "none" }}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) {
-          onClose();
-        }
-      }}
-      aria-hidden={!open}
-    >
-      <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby="privacy-title">
-        <div className="modal-header">
-          <h2 id="privacy-title">Ochrana osobných údajov</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Zatvoriť">
-            &times;
-          </button>
-        </div>
-        <div className="modal-body">
-          <div className="company-info">
-            <p>
-              <strong>Penelcom s.r.o.</strong>
-              <br />
-              Sídlisko 1. mája 7/69 093 01 Vranov nad Topľou <br />
-              IČO: 46664386, DIČ: 2023509862
-              <br />
-              E-mail: penelcom@penel.sk
-              <br />
-              Tel.: +421 949 654 829
-            </p>
-          </div>
-
-          <p>
-            Tieto Zásady ochrany osobných údajov (ďalej len „Zásady&quot;) popisujú, aké osobné údaje spracúvame v
-            súvislosti s používaním našej webovej stránky a kontaktných formulárov.
-          </p>
-
-          <hr className="section-divider" />
-
-          <h3>I. Kontaktný formulár</h3>
-          <p>Na stránke www.penelcom.sk prevádzkujeme kontaktný formulár, ktorého účelom je umožniť vám:</p>
-          <ul>
-            <li>Položiť otázku k našim produktom a službám</li>
-            <li>Požiadať o cenovú ponuku</li>
-          </ul>
-
-          <p>
-            <strong>Rozsah spracúvaných údajov:</strong>
-          </p>
-          <ul>
-            <li>Meno a priezvisko</li>
-            <li>E-mailová adresa</li>
-            <li>Telefónne číslo</li>
-          </ul>
-
-          <p>
-            <strong>Účel spracovania:</strong>
-            <br />
-            Spracúvame uvedené údaje, aby sme vás mohli kontaktovať a reagovať na váš dopyt.
-          </p>
-
-          <p>
-            <strong>Právny základ:</strong>
-            <br />
-            Článok 6 ods. 1 písm. b) GDPR – plnenie opatrení pred uzavretím zmluvy na žiadosť dotknutej osoby.
-          </p>
-
-          <p>
-            <strong>Doba uchovávania:</strong>
-            <br />
-            Osobné údaje budeme uchovávať maximálne 10 rokov od odozvy na váš dopyt, pokiaľ nevznikne ďalší
-            zmluvný vzťah.
-          </p>
-
-          <hr className="section-divider" />
-
-          <h3>II. Súbory cookies</h3>
-          <p>Na našej webovej stránke používame cookies výlučne na nasledujúce účely:</p>
-          <ul>
-            <li>
-              <strong>Nevyhnutné cookies</strong> – zabezpečujú základnú funkčnosť stránky (napr. ukladanie relácie,
-              nastavení prehliadača).
-            </li>
-            <li>
-              <strong>Štatistické (analytické) cookies</strong> – pomáhajú nám pochopiť, ako návštevníci stránku
-              používajú (nasadzujeme ich len so súhlasom používateľa).
-            </li>
-          </ul>
-
-          <p>
-            <strong>Správa súhlasov:</strong>
-            <br />
-            Používateľ môže kedykoľvek odvolať súhlas s využívaním štatistických cookies prostredníctvom nastavení
-            cookie lišty alebo priamo v prehliadači.
-          </p>
-
-          <hr className="section-divider" />
-
-          <h3>III. Práva dotknutej osoby</h3>
-          <p>Podľa nariadenia GDPR máte nasledujúce práva:</p>
-          <ul>
-            <li>Prístup k osobným údajom, ktoré spracúvame</li>
-            <li>Oprava nepresných alebo neúplných údajov</li>
-            <li>Vymazanie („právo zabudnutia&quot;), ak na spracovanie už nie je právny základ</li>
-            <li>Obmedzenie spracovania</li>
-            <li>Prenosnosť údajov</li>
-            <li>Odvolanie súhlasu – stane sa účinným dňom odvolania</li>
-            <li>
-              Podanie sťažnosti u Úradu na ochranu osobných údajov SR (Hraničná 12, 820 07 Bratislava,
-              www.dataprotection.gov.sk)
-            </li>
-          </ul>
-
-          <p>
-            V prípade otázok alebo uplatnenia Vašich práv nás môžete kontaktovať na penelcom@penel.sk alebo
-            telefónnom čísle +421 949 654 829.
-          </p>
-
-          <hr className="section-divider" />
-
-          <p className="effective-date">
-            <strong>Tieto Zásady nadobúdajú účinnosť dňom 19. 7. 2025.</strong>
-          </p>
-        </div>
-      </div>
-    </div>
   );
 }
