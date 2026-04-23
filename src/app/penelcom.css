@@ -2266,11 +2266,6 @@ body.modal-open > *:not(.modal) {
     color: #666;
 }
 
-.materials-text p:first-child {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #333;
-}
 
 .materials-highlights {
     background: white;
