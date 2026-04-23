@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import CookieConsent from "@/components/CookieConsent";
 import SiteEffects from "@/components/SiteEffects";
 import { seoKeywords, siteMeta, siteUrl } from "@/data/site";
 import "./globals.css";
 import "./penelcom.css";
+
+const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -112,7 +115,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]) }}
         />
       </head>
-      <body>
+      <body className={inter.className}>
         <SiteEffects />
         {children}
         <CookieConsent />

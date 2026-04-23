@@ -19,6 +19,9 @@ const navItems = [
   { label: "Kontakt", href: "#footer" },
 ] as const;
 
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+
 function ArrowIcon() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -51,8 +54,6 @@ function StarIcon() {
 
 export default function PenelcomSite() {
   const [activeHero, setActiveHero] = useState(0);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [heroParallax, setHeroParallax] = useState(0);
 
@@ -67,12 +68,10 @@ export default function PenelcomSite() {
   useEffect(() => {
     const updateScrollState = () => {
       const heroHeight = document.querySelector<HTMLElement>(".hero")?.offsetHeight ?? window.innerHeight;
-      const triggerPoint = heroHeight * 0.3;
       const documentHeight = document.documentElement.scrollHeight - window.innerHeight;
 
-      setIsScrolled(window.scrollY > triggerPoint);
       setScrollProgress(documentHeight > 0 ? (window.scrollY / documentHeight) * 100 : 0);
-      setHeroParallax(Math.min(window.scrollY * 0.24, 240));
+      setHeroParallax(Math.min(window.scrollY * 0.15, 180));
     };
 
     updateScrollState();
@@ -126,8 +125,6 @@ export default function PenelcomSite() {
     };
   }, []);
 
-  const closeMenu = () => setMenuOpen(false);
-  const showSolidNav = isScrolled || menuOpen;
   const heroStyle = { "--hero-parallax": `${heroParallax}px` } as CSSProperties & Record<"--hero-parallax", string>;
 
   return (
@@ -136,35 +133,7 @@ export default function PenelcomSite() {
         <div className="scroll-progress-bar" style={{ height: `${scrollProgress}%` }} />
       </div>
 
-      <nav className={`navbar ${showSolidNav ? "scrolled" : ""}`} aria-label="Hlavná navigácia">
-        <div className="nav-container">
-          <div className="nav-logo">
-            <a href="#home" className="logo-link" onClick={closeMenu} aria-label="Penelcom domov">
-              <Image src="/assets/logo.png" alt="Penelcom" width={916} height={126} className="logo-img" priority />
-            </a>
-          </div>
-          <ul className={`nav-menu ${menuOpen ? "active" : ""}`}>
-            {navItems.map((item) => (
-              <li key={item.label}>
-                <a href={item.href} className="nav-link" onClick={closeMenu}>
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <button
-            type="button"
-            className={`hamburger ${menuOpen ? "active" : ""}`}
-            aria-label={menuOpen ? "Zatvoriť menu" : "Otvoriť menu"}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-        </div>
-      </nav>
+      <Navbar />
 
       <section id="home" className="hero" style={heroStyle}>
         <div className="hero-background" aria-hidden="true">
@@ -392,104 +361,7 @@ export default function PenelcomSite() {
         </div>
       </section>
 
-      <footer id="footer" className="footer">
-        <div className="container">
-          <div className="footer-top" data-reveal>
-            <div className="footer-cta-content">
-              <h2>Potrebujete elektrotechnické služby?</h2>
-              <p>Kontaktujte nás a my Vám radi poradíme</p>
-            </div>
-            <div className="footer-cta-button">
-              <a href={siteMeta.phoneHref} className="footer-btn roll-btn">
-                <RollingText>Zavolať</RollingText>
-              </a>
-            </div>
-          </div>
-
-          <div className="footer-divider" />
-
-          <div className="footer-content" data-reveal>
-            <div className="footer-section footer-contact">
-              <h3>Penelcom s.r.o.</h3>
-              <p>
-                <strong>Adresa:</strong>
-                <br />
-                Sídlisko 1. mája 7/69
-                <br />
-                093 01 Vranov nad Topľou
-              </p>
-              <p>
-                <strong>Kancelária:</strong>
-                <br />
-                Budovateľská 1288
-                <br />
-                093 01 Vranov nad Topľou (areál DMJ)
-              </p>
-              <p>
-                <strong>Email:</strong> <a href={`mailto:${siteMeta.legalEmail}`}>{siteMeta.email}</a>
-              </p>
-              <p>
-                <strong>Telefonický kontakt:</strong> <a href={siteMeta.phoneHref}>{siteMeta.phone}</a>
-              </p>
-            </div>
-
-            <div className="footer-section footer-navigation">
-              <div className="footer-nav-column">
-                <h4>Navigácia</h4>
-                <ul>
-                  <li>
-                    <a href="#home">Domov</a>
-                  </li>
-                  <li>
-                    <a href="#services">Služby</a>
-                  </li>
-                  <li>
-                    <a href="#footer">Kontakt</a>
-                  </li>
-                </ul>
-              </div>
-              <div className="footer-nav-column">
-                <h4>Služby</h4>
-                <ul>
-                  {["Elektroinštalácie", "Meranie a regulácie", "Fotovoltika", "NN rozvádzače", "Zabezpečovacie systémy"].map(
-                    (item) => (
-                      <li key={item}>
-                        <a href="#services">{item}</a>
-                      </li>
-                    ),
-                  )}
-                </ul>
-              </div>
-              <div className="footer-nav-column">
-                <h4>Legal</h4>
-                <ul>
-                  <li>
-                    <Link href="/ochrana-osobnych-udajov" id="privacy-policy-link">
-                      Ochrana osobných údajov
-                    </Link>
-                  </li>
-                  <li>
-                    <button type="button" className="footer-cookie-link" onClick={openCookieSettings}>
-                      Cookies
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="footer-bottom" data-reveal>
-            <div className="footer-credit">
-              <a href="https://aebdigital.com" target="_blank" rel="noopener noreferrer" className="credit-link">
-                Tvorba stránky - AEB Digital
-              </a>
-            </div>
-            <div className="footer-copyright">
-              <p>&copy; 2024 Penelcom s.r.o. Všetky práva vyhradené.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
     </>
   );
