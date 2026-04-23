@@ -55,8 +55,6 @@ export default function SiteEffects() {
           ".materials-text p",
           ".materials-highlights li",
           ".privacy-content > *",
-          ".footer-contact p",
-          ".footer-nav-column li",
         ].join(", "),
       ),
     ).filter((target, index, allTargets) => allTargets.indexOf(target) === index);

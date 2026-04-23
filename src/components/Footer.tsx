@@ -9,7 +9,7 @@ export default function Footer() {
   return (
     <footer id="footer" className="footer">
       <div className="container">
-        <div className="footer-top" data-reveal>
+        <div className="footer-top">
           <div className="footer-cta-content">
             <h2>Potrebujete elektrotechnické služby?</h2>
             <p>Kontaktujte nás a my Vám radi poradíme</p>
@@ -23,7 +23,7 @@ export default function Footer() {
 
         <div className="footer-divider" />
 
-        <div className="footer-content" data-reveal>
+        <div className="footer-content">
           <div className="footer-section footer-contact">
             <h3>Penelcom s.r.o.</h3>
             <p>
@@ -93,7 +93,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="footer-bottom" data-reveal>
+        <div className="footer-bottom">
           <div className="footer-credit">
             <a href="https://aebdigital.sk" target="_blank" rel="noopener noreferrer" className="credit-link">
               Tvorba stránky - AEB Digital
